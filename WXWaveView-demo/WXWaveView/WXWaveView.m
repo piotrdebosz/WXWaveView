@@ -11,47 +11,47 @@
 #import "WXWeakObject.h"
 
 @interface WXWaveView ()
-
-@property (assign, nonatomic) CGFloat offsetX;
-@property (strong, nonatomic) CADisplayLink *waveDisplayLink;
-@property (strong, nonatomic) CAShapeLayer *waveShapeLayer;
-
-@end
+    
+    @property (assign, nonatomic) CGFloat offsetX;
+    @property (strong, nonatomic) CADisplayLink *waveDisplayLink;
+    @property (strong, nonatomic) CAShapeLayer *waveShapeLayer;
+    
+    @end
 
 @implementation WXWaveView
-
+    
 - (void)dealloc {
     [self.waveDisplayLink invalidate];
     self.waveDisplayLink = nil;
 }
-
+    
 + (instancetype)addToView:(UIView *)view withFrame:(CGRect)frame {
     WXWaveView *waveView = [[self alloc] initWithFrame:frame];
     [view addSubview:waveView];
     return waveView;
 }
-
+    
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         [self basicSetup];
     }
     return self;
 }
-
+    
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if ([super initWithCoder:aDecoder]) {
         [self basicSetup];
     }
     return self;
 }
-
+    
 - (void)basicSetup {
     _angularSpeed = 2.f;
     _waveSpeed = 9.f;
     _waveTime = 1.5f;
     _waveColor = [UIColor whiteColor];
 }
-
+    
 - (BOOL)wave {
     if (self.waveShapeLayer.path) {
         return NO;
@@ -59,6 +59,11 @@
     self.waveShapeLayer = [CAShapeLayer layer];
     self.waveShapeLayer.fillColor = self.waveColor.CGColor;
     
+    CALayer *fillLayer = [CALayer layer];
+    fillLayer.frame = CGRectMake(self.frame.origin.x, 4.8, self.frame.size.width, self.frame.size.height);
+    fillLayer.backgroundColor = UIColor.blackColor.CGColor;
+    
+    [self.layer addSublayer:fillLayer];
     [self.layer addSublayer:self.waveShapeLayer];
     
     self.waveDisplayLink = [CADisplayLink displayLinkWithTarget:[WXWeakObject weakObjectWithRealTarget:self] selector:@selector(currentWave)];
@@ -71,15 +76,15 @@
     }
     return YES;
 }
-
+    
 - (void)currentWave {
     self.offsetX -= (self.waveSpeed * self.superview.frame.size.width / 320);
     CGFloat width = CGRectGetWidth(self.frame);
-    CGFloat height = CGRectGetHeight(self.frame);
+    CGFloat height = 5;
     
     CGMutablePathRef path = CGPathCreateMutable();
     CGPathMoveToPoint(path, NULL, 0, height / 2);
-
+    
     CGFloat y = 0.f;
     for (CGFloat x = 0.f; x <= width ; x++) {
         y = height * sin(0.01 * (self.angularSpeed * x + self.offsetX));
@@ -92,7 +97,7 @@
     self.waveShapeLayer.path = path;
     CGPathRelease(path);
 }
-
+    
 - (void)stop {
     [UIView animateWithDuration:1.f animations:^{
         self.alpha = 0.f;
@@ -104,5 +109,6 @@
     }];
     
 }
-
+    
 @end
+
